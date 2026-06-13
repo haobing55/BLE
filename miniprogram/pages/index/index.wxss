@@ -1,0 +1,79 @@
+.container {
+  padding: 20rpx;
+  background: #f5f6f7;
+}
+
+.status-box {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.btn-group button {
+  margin-bottom: 15rpx;
+}
+
+.scan-tip {
+  text-align: center;
+  color: #888;
+  margin: 10rpx 0;
+}
+
+.device-box {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-top: 20rpx;
+}
+
+.title {
+  font-weight: bold;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.device-item {
+  padding: 15rpx;
+  border-bottom: 1px solid #eee;
+}
+
+.device-name {
+  font-size: 28rpx;
+}
+
+.device-id {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.connect-box {
+  margin-top: 20rpx;
+  padding: 15rpx;
+  background: #fff;
+  border-radius: 12rpx;
+}
+
+.send-box, .recv-box {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #fff;
+  border-radius: 12rpx;
+}
+
+.input {
+  border: 1px solid #ddd;
+  padding: 15rpx;
+  margin: 10rpx 0;
+  border-radius: 8rpx;
+}
+
+.recv-data {
+  min-height: 60rpx;
+  padding: 10rpx;
+  background: #f9f9f9;
+  border-radius: 8rpx;
+  color: #333;
+}

@@ -1,0 +1,70 @@
+<view class="container">
+
+<!-- 🔵 状态区 -->
+<view class="status-box">
+  <text>蓝牙状态：{{bleStatus || '未初始化'}}</text>
+  <text>连接设备：{{connectedDeviceName || '未连接'}}</text>
+</view>
+
+<!-- 🔘 操作区 -->
+<view class="btn-group">
+  <button type="primary" bindtap="openBluetooth">① 初始化蓝牙</button>
+  <button type="default" bindtap="startScan">② 扫描设备</button>
+</view>
+
+<!-- 🔍 扫描提示 -->
+<view class="scan-tip">
+  <text wx:if="{{isScanning}}">🔍 正在扫描设备...</text>
+</view>
+
+<!-- 📱 设备列表 -->
+<view class="device-box">
+  <text class="title">发现设备</text>
+
+  <block wx:for="{{devices}}" wx:key="deviceId">
+    <view class="device-item" bindtap="connectDevice" data-id="{{item.deviceId}}">
+
+      <view class="device-name">
+        📱 {{item.name || 'Unknown Device'}}
+      </view>
+
+      <view class="device-id">
+        {{item.deviceId}}
+      </view>
+
+    </view>
+  </block>
+</view>
+
+<!-- 🔗 连接状态 -->
+<view class="connect-box">
+  <text>连接状态：</text>
+  <text wx:if="{{deviceId}}">✔ 已连接</text>
+  <text wx:else>❌ 未连接</text>
+</view>
+
+<!-- 📤 发送区 -->
+<view class="send-box">
+  <text class="title">📤 发送数据（FFF2）</text>
+
+  <input
+    placeholder="输入要发送的数据"
+    bindinput="inputChange"
+    class="input"
+  />
+
+  <button type="primary" bindtap="sendData">
+    发送
+  </button>
+</view>
+
+<!-- 📥 接收区 -->
+<view class="recv-box">
+  <text class="title">📥 接收数据（FFF1 Notify）</text>
+
+  <view class="recv-data">
+    {{recvData || '暂无数据'}}
+  </view>
+</view>
+
+</view>
