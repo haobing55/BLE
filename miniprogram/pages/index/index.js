@@ -11,7 +11,26 @@ Page({
     isScanning: false,
     connectedDeviceName: ""
   },
+  onShow() {
 
+    wx.getBluetoothAdapterState({
+      success: res => {
+  
+        console.log("当前蓝牙状态:", res)
+  
+        if (res.available) {
+  
+          wx.showToast({
+            title: "蓝牙已开启",
+            icon: "success"
+          })
+  
+        }
+  
+      }
+    })
+  
+  },
   // =========================
   // 1️⃣ 初始化蓝牙
   // =========================
@@ -29,10 +48,30 @@ Page({
       fail: err => {
         console.log("初始化失败", err)
 
-        wx.showModal({
-          title: "蓝牙初始化失败",
-          content: JSON.stringify(err)
-        })
+        if (err.errCode === 10001) {
+      
+          wx.showModal({
+            title: "蓝牙未开启",
+            content: "检测到手机蓝牙未开启，是否前往设置打开蓝牙？",
+            success: res => {
+      
+              if (res.confirm) {
+      
+                wx.openSystemBluetoothSetting({
+                  success() {
+                    console.log("已打开蓝牙设置页")
+                  },
+                  fail(err) {
+                    console.log("打开设置页失败", err)
+                  }
+                })
+      
+              }
+      
+            }
+          })
+      
+        }
       }
     })
   },
@@ -117,12 +156,14 @@ Page({
     wx.getBLEDeviceServices({
       deviceId,
       success: res => {
-
+  
         console.log("服务列表:", res.services)
 
-        if (!res.services.length) return
-
-        let serviceId = res.services[3].uuid
+        let targetService = res.services.find(s =>
+          s.uuid.includes("FFF0")
+        )
+        if (!targetService) return
+        let serviceId = targetService.uuid
 
         this.setData({ serviceId })
 
@@ -171,32 +212,27 @@ Page({
   // =========================
   openNotify(deviceId, serviceId, charId) {
 
-    wx.notifyBLECharacteristicValueChange({
-      deviceId,
-      serviceId,
-      characteristicId: charId,
-      state: true,
-      success: () => {
+      wx.offBLECharacteristicValueChange()
 
-        console.log("Notify开启成功")
-
-        wx.offBLECharacteristicValueChange()
-
-        wx.onBLECharacteristicValueChange(res => {
-
-          let hex = this.ab2hex(res.value)
-
-          console.log("收到数据:", hex)
-
-          this.setData({
-            recvData: hex
-          })
-        })
-      },
-      fail: err => {
-        console.log("Notify失败:", err)
-      }
-    })
+      wx.onBLECharacteristicValueChange(res => {
+        let str = this.ab2hex(res.value)
+        console.log("收到数据:", str)
+    
+        this.setData({ recvData: str })
+      })
+    
+      wx.notifyBLECharacteristicValueChange({
+        deviceId,
+        serviceId,
+        characteristicId: charId,
+        state: true,
+        success: () => {
+          console.log("Notify开启成功")
+        },
+        fail: err => {
+          console.log("Notify失败:", err)
+        }
+      })     
   },
 
   // =========================
@@ -213,7 +249,7 @@ Page({
     }
 
     let buffer = this.stringToBuffer(this.data.input)
-    console.log("📤 发送内容(Hex):", this.ab2hex(buffer),this.data.writeCharId)
+    console.log("📤 发送内容(Hex):", buffer)
     wx.writeBLECharacteristicValue({
       deviceId: this.data.deviceId,
       serviceId: this.data.serviceId,
@@ -239,6 +275,7 @@ Page({
   // 工具函数
   // =========================
   stringToBuffer(str) {
+   
     let buffer = new ArrayBuffer(str.length)
     let dataView = new Uint8Array(buffer)
 
@@ -250,6 +287,7 @@ Page({
   },
 
   ab2hex(buffer) {
+     //发送ASCII码
     return Array.from(new Uint8Array(buffer))
       .map(b => b.toString(16).padStart(2, '0'))
       .join('')
